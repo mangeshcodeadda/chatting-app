@@ -1,20 +1,20 @@
 .chat-layout {
   display: flex;
   height: 100vh;
-  background: #f5f7fb;
+  background: var(--bg);
 }
 
 .sidebar {
   width: 320px;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #ddd;
-  background: white;
+  border-right: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .sidebar-header {
   padding: 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border);
 
   display: flex;
   justify-content: space-between;
@@ -23,26 +23,47 @@
 
 .username {
   margin: 0;
+  color: var(--text-h);
 }
 
 .email {
-  color: gray;
+  color: var(--text);
 }
 
 .logout-btn {
   padding: 8px 12px;
   cursor: pointer;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent);
 }
 
 .sidebar-actions {
   padding: 15px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border);
 }
 
 .new-chat-btn {
   width: 100%;
   padding: 10px;
   cursor: pointer;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.new-chat-btn:hover {
+  filter: brightness(1.1);
 }
 
 .sidebar-content {
@@ -54,6 +75,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  background: var(--bg);
 }
 
 .empty-chat {
@@ -65,5 +87,5 @@
   justify-content: center;
   align-items: center;
 
-  color: #666;
+  color: var(--text);
 }
