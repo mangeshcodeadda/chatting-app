@@ -8,6 +8,7 @@ import {
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Chat from "./pages/Chat";
+import Home from "./pages/Home";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -20,11 +21,7 @@ function App() {
 
         <Route
           path="/"
-          element={
-            <Navigate
-              to="/chat"
-            />
-          }
+          element={<Home />}
         />
 
         <Route
