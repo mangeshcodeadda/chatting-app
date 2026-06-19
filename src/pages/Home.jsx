@@ -7,11 +7,10 @@ import {
   Heart,
 } from "lucide-react";
 import { Avatar } from "../utils/avatarUtils";
-import "../Index.css";
 
 function Home() {
   const friendNames = [
-    "Mangesh",
+    "Mangesh",  
     "Riya",
     "Rahul",
     "Vedant",
