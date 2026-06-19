@@ -1,123 +1,110 @@
 import { useState } from "react";
-import {
-  Link,
-  useNavigate
-} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Mail, Lock, AlertCircle } from "lucide-react";
 
 import { supabase } from "../api/supabase";
 
 function Login() {
+  const navigate = useNavigate();
 
-  const navigate =
-    useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const [email, setEmail] =
-    useState("");
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-  const [password,
-    setPassword] =
-    useState("");
+    try {
+      setLoading(true);
+      setError("");
 
-  const [loading,
-    setLoading] =
-    useState(false);
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-  const handleLogin =
-    async (e) => {
-
-      e.preventDefault();
-
-      try {
-
-        setLoading(true);
-
-        const { error } =
-          await supabase.auth.signInWithPassword({
-            email,
-            password
-          });
-
-        if (error) {
-          alert(error.message);
-          return;
-        }
-
-        navigate("/chat");
-
-      } catch (err) {
-
-        console.error(err);
-        alert(
-          "Login failed"
-        );
-
-      } finally {
-
-        setLoading(false);
-
+      if (error) {
+        setError(error.message);
+        return;
       }
-    };
+
+      navigate("/chat");
+    } catch (err) {
+      console.error(err);
+      setError("Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="auth-page">
+      <form className="auth-card" onSubmit={handleLogin}>
+        <h1>Login</h1>
+        <p className="auth-subtitle">
+          Welcome back! Sign in to continue chatting
+        </p>
 
-      <form
-        className="auth-card"
-        onSubmit={handleLogin}
-      >
+        {error && (
+          <div className="error-message">
+            <AlertCircle />
+            {error}
+          </div>
+        )}
 
-        <h1>
-          Login
-        </h1>
+        <div className="form-group">
+          <label htmlFor="email">
+            <Mail />
+            Email
+          </label>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) =>
-            setEmail(
-              e.target.value
-            )
-          }
-          required
-        />
+          <input
+            id="email"
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) =>
-            setPassword(
-              e.target.value
-            )
-          }
-          required
-        />
+        <div className="form-group">
+          <label htmlFor="password">
+            <Lock />
+            Password
+          </label>
+
+          <input
+            id="password"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
 
         <button
           type="submit"
+          className="auth-button"
+          disabled={loading}
         >
-          {loading
-            ? "Logging In..."
-            : "Login"}
+          {loading ? (
+            <>
+              <span className="spinner" />
+              Logging In...
+            </>
+          ) : (
+            "Login"
+          )}
         </button>
 
-        <p>
-
-          Don't have an account?
-
-          {" "}
-
-          <Link
-            to="/register"
-          >
-            Register
-          </Link>
-
+        <p className="auth-footer">
+          Don't have an account?{" "}
+          <Link to="/register">Register</Link>
         </p>
-
       </form>
-
     </div>
   );
 }
