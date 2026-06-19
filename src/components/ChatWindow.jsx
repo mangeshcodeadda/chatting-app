@@ -7,7 +7,10 @@ import { markMessagesAsRead } from "../services/messageService";
 import { Avatar } from "../utils/avatarUtils";
 
 function formatTime(isoString) {
-  return new Date(isoString).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return new Date(isoString + "Z").toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function formatDateLabel(isoString) {
