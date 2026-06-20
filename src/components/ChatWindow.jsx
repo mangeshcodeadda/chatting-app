@@ -80,6 +80,25 @@ function ChatWindow({ selectedUser, onBack }) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Handle mobile keyboard scroll position
+  useEffect(() => {
+    if (!window.visualViewport) return;
+
+    const handleResize = () => {
+      // When keyboard opens, ensure header stays visible
+      const messagesContainer = document.querySelector('.cw-messages');
+      if (messagesContainer && document.activeElement?.tagName === 'INPUT') {
+        // Scroll messages to bottom to show latest messages
+        messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+      }
+    };
+
+    window.visualViewport.addEventListener("resize", handleResize);
+    return () => {
+      window.visualViewport.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   const initializeChat = async () => {
     const { data: myChats } = await supabase
       .from("chat_participants").select("chat_id").eq("user_id", user.id);
@@ -172,6 +191,13 @@ function ChatWindow({ selectedUser, onBack }) {
         .cw-window {
           display: flex; flex-direction: column; height: 100%;
           font-family: 'Inter', -apple-system, sans-serif;
+        }
+        @media (max-width: 640px) {
+          .cw-window {
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+          }
         }
 
         /* ── HEADER ── */
