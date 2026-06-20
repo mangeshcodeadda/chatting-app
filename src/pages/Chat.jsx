@@ -12,10 +12,32 @@ function Chat() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [showNewChat, setShowNewChat] = useState(false);
   const [mobileView, setMobileView] = useState("list");
+  const [viewportHeight, setViewportHeight] = useState(null);
 
   useEffect(() => {
     if (user) loadProfile();
   }, [user]);
+
+  // Handle mobile keyboard using Visual Viewport API
+  useEffect(() => {
+    if (!window.visualViewport) return;
+
+    const handleResize = () => {
+      setViewportHeight(window.visualViewport.height);
+      // Prevent default scroll behavior when keyboard opens
+      if (document.activeElement && document.activeElement.tagName === 'INPUT') {
+        window.scrollTo(0, 0);
+      }
+    };
+
+    window.visualViewport.addEventListener("resize", handleResize);
+    // Set initial height
+    setViewportHeight(window.visualViewport.height);
+
+    return () => {
+      window.visualViewport.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const loadProfile = async () => {
     const { data } = await supabase
@@ -71,14 +93,23 @@ function Chat() {
 
         /* ── MOBILE ── */
         @media (max-width: 640px) {
+          .chat-layout {
+            position: relative;
+            height: ${viewportHeight ? `${viewportHeight}px` : '100dvh'};
+            overflow: hidden;
+          }
           .sidebar {
-            position: fixed; inset: 0;
+            position: absolute; inset: 0;
             width: 100%; min-width: 100%;
             z-index: 10; border-right: none;
+            overflow: hidden;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           }
           .sidebar.hidden-mobile { transform: translateX(-100%); pointer-events: none; }
           .chat-area {
-            position: fixed; inset: 0; width: 100%; z-index: 10;
+            position: absolute; inset: 0; width: 100%; z-index: 10;
+            overflow: hidden;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           }
           .chat-area.hidden-mobile { transform: translateX(100%); pointer-events: none; }
         }
