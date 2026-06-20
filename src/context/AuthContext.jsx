@@ -12,19 +12,25 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
 
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const INACTIVITY_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
 
   useEffect(() => {
 
-    supabase.auth.getUser()
-      .then(({ data }) => {
-        setUser(data.user);
-      });
+    const initializeAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      setUser(data.session?.user ?? null);
+      setLoading(false);
+    };
+
+    initializeAuth();
 
     const {
       data: listener
     } = supabase.auth.onAuthStateChange(
       (_, session) => {
         setUser(session?.user ?? null);
+        setLoading(false);
       }
     );
 
@@ -42,10 +48,45 @@ export function AuthProvider({ children }) {
     }
   };
 
+  useEffect(() => {
+    if (!user) return;
+
+    let inactivityTimer;
+
+    const resetTimer = () => {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        logout();
+      }, INACTIVITY_TIMEOUT);
+    };
+
+    const handleActivity = () => {
+      resetTimer();
+    };
+
+    const activityEvents = [
+      'mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'
+    ];
+
+    activityEvents.forEach(event => {
+      window.addEventListener(event, handleActivity);
+    });
+
+    resetTimer();
+
+    return () => {
+      clearTimeout(inactivityTimer);
+      activityEvents.forEach(event => {
+        window.removeEventListener(event, handleActivity);
+      });
+    };
+  }, [user]);
+
   return (
     <AuthContext.Provider
       value={{
         user,
+        loading,
         logout
       }}
     >
